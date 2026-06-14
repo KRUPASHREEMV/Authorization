@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>TodoAuth — Interactive UI Blueprint</title>
+<style>
+:root{
+  --bg:#0b0d14;--surface:#131620;--surface2:#1c2030;--surface3:#242840;
+  --border:#2a2f4a;--border2:#353c60;
+  --accent:#4f8ef7;--accent2:#7c5cfc;--accent3:#06b6d4;
+  --green:#22c55e;--red:#ef4444;--yellow:#f59e0b;--orange:#f97316;--pink:#ec4899;
+  --text:#e2e8f0;--muted:#64748b;--muted2:#94a3b8;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ── HEADER ── */
+.site-header{
+  background:linear-gradient(135deg,#0f1520 0%,#131a2e 100%);
+  border-bottom:1px solid var(--border);
+  padding:24px 40px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;
+}
+.site-header h1{
+  font-size:1.4rem;font-weight:800;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.site-header p{font-size:0.75rem;color:var(--muted2);margin-top:3px;}
+.header-badges{display:flex;gap:8px;flex-wrap:wrap;}
+.badge{font-size:0.65rem;padding:3px 10px;border-radius:100px;font-weight:700;border:1px solid;}
+.badge-blue{background:#1e3a5f;color:var(--accent);border-color:#2a4f80;}
+.badge-purple{background:#2d1b4e;color:#a78bfa;border-color:#3d2570;}
+.badge-green{background:#14352a;color:var(--green);border-color:#1e5040;}
+.badge-orange{background:#3d1c00;color:var(--orange);border-color:#5a2a00;}
+
+/* ── NAV ── */
+.nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(11,13,20,0.96);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  display:flex;gap:4px;padding:10px 40px;overflow-x:auto;
+}
+.nav a{
+  font-size:0.78rem;font-weight:600;color:var(--muted2);
+  padding:6px 14px;border-radius:6px;text-decoration:none;white-space:nowrap;
+  border:1px solid transparent;transition:all .15s;
+}
+.nav a:hover{background:var(--surface2);border-color:var(--border2);color:var(--accent);}
+
+/* ── SECTIONS ── */
+.section{padding:48px 40px;max-width:1400px;margin:0 auto;}
+.section-label{font-size:0.7rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;}
+.section-title{font-size:1.5rem;font-weight:800;margin-bottom:6px;}
+.section-sub{font-size:0.82rem;color:var(--muted2);margin-bottom:36px;}
+
+/* ── HINT BAR ── */
+.hint-bar{
+  background:linear-gradient(90deg,#1e3a5f40,#2d1b4e40);
+  border:1px solid var(--border2);border-radius:10px;
+  padding:12px 18px;margin-bottom:32px;
+  font-size:0.78rem;color:var(--muted2);
+  display:flex;align-items:center;gap:10px;
+}
+
+/* ── SCREENS GRID ── */
+.screens-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:28px;}
+
+/* ── SCREEN WRAPPER ── */
+.screen-wrap{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:16px;overflow:visible;
+  transition:border-color .2s,box-shadow .2s;
+}
+.screen-wrap:hover{border-color:var(--border2);box-shadow:0 8px 40px rgba(79,142,247,.08);}
+
+.screen-topbar{
+  background:var(--surface2);padding:12px 16px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);border-radius:14px 14px 0 0;
+}
+.screen-dots{display:flex;gap:6px;}
+.dot{width:10px;height:10px;border-radius:50%;}
+.dot-red{background:#ef4444;} .dot-yellow{background:#f59e0b;} .dot-green{background:#22c55e;}
+.screen-url{font-size:0.65rem;color:var(--muted);font-family:monospace;background:var(--surface3);padding:3px 10px;border-radius:100px;border:1px solid var(--border);}
+.badge-protected{font-size:0.62rem;font-weight:700;padding:3px 8px;border-radius:4px;background:#3d1c00;color:var(--orange);border:1px solid #5a2a00;}
+
+.screen-body{padding:20px;}
+
+/* ── MOCK ELEMENTS ── */
+.mock-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:22px;}
+.mock-h{font-size:1rem;font-weight:800;margin-bottom:2px;}
+.mock-sub{font-size:0.72rem;color:var(--muted2);margin-bottom:18px;}
+.mock-field{margin-bottom:13px;}
+.mock-lbl{font-size:0.62rem;color:var(--muted2);margin-bottom:5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;}
+.mock-input-row{display:flex;gap:10px;margin-bottom:0;}
+.mock-input-row .mock-field{flex:1;}
+.mock-divider{border:none;border-top:1px solid var(--border);margin:14px 0;}
+.mock-alert{padding:9px 12px;border-radius:7px;font-size:0.72rem;margin-bottom:13px;display:flex;align-items:center;gap:8px;}
+.alert-info{background:#1e3a5f20;color:var(--accent);border:1px solid #2a4f80;}
+.alert-success{background:#14352a30;color:var(--green);border:1px solid #1e5040;}
+.mock-user-row{display:flex;align-items:center;gap:14px;margin-bottom:16px;}
+.mock-avatar{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:900;color:#fff;flex-shrink:0;}
+.mock-stat-row{display:flex;gap:8px;margin-bottom:14px;}
+.mock-stat{flex:1;background:var(--surface3);border:1px solid var(--border);border-radius:8px;padding:10px 8px;text-align:center;}
+.mock-stat-v{font-size:1rem;font-weight:800;color:var(--accent);}
+.mock-stat-l{font-size:0.6rem;color:var(--muted2);margin-top:2px;}
+.role-pill{font-size:0.62rem;font-weight:700;padding:2px 8px;border-radius:100px;background:#1e3a5f;color:var(--accent);border:1px solid #2a4f80;}
+
+/* ══════════════════════════════════════
+   INTERACTIVE ELEMENT (hover tooltip)
+══════════════════════════════════════ */
+.iel{position:relative;cursor:pointer;}
+
+/* BASE INPUT STYLE */
+.mock-input{
+  background:var(--surface3);border:1.5px solid var(--border2);
+  border-radius:7px;padding:9px 12px;
+  font-size:0.78rem;color:var(--muted2);
+  display:flex;align-items:center;gap:8px;
+  transition:border-color .15s,background .15s;
+  cursor:pointer;
+}
+.iel:hover .mock-input{border-color:var(--accent);background:#1a2040;}
+
+/* BASE BUTTON STYLE */
+.mock-btn{
+  width:100%;padding:10px 16px;border-radius:8px;
+  font-size:0.8rem;font-weight:700;text-align:center;
+  margin-bottom:8px;border:none;outline:none;cursor:pointer;
+  transition:filter .15s,transform .1s,box-shadow .15s;
+  position:relative;
+}
+.mock-btn:hover{filter:brightness(1.18);transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,0,0,.4);}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
+.btn-danger{background:transparent;border:1.5px solid var(--red)!important;color:var(--red);}
+.btn-ghost{background:transparent;border:none;color:var(--accent);font-size:0.72rem;font-weight:600;padding:5px 8px;width:auto;margin:0;cursor:pointer;}
+.btn-ghost:hover{color:#90c0ff;filter:none;transform:none;}
+
+.mock-link{font-size:0.74rem;color:var(--accent);text-align:center;margin-top:5px;display:block;cursor:pointer;transition:color .15s;}
+.mock-link:hover{color:#a0c4ff;text-decoration:underline;}
+
+.mock-otp{
+  background:var(--surface3);border:2px solid var(--accent);
+  border-radius:10px;padding:14px;
+  font-size:1.6rem;font-weight:900;color:var(--accent);
+  letter-spacing:.5em;text-align:center;margin-bottom:13px;
+  font-family:monospace;cursor:pointer;
+  transition:border-color .15s,box-shadow .15s;
+}
+.iel:hover .mock-otp{border-color:#7ab8ff;box-shadow:0 0 20px rgba(79,142,247,.25);}
+
+.init-indicator{
+  background:var(--surface3);border:1px dashed var(--border2);
+  border-radius:7px;padding:8px 12px;
+  font-size:0.7rem;color:var(--muted2);text-align:center;cursor:pointer;
+  margin-bottom:13px;transition:border-color .15s,background .15s;
+}
+.iel:hover .init-indicator{border-color:var(--orange);background:#3d1c0030;color:var(--orange);}
+
+.guard-indicator{
+  background:#3d1c0040;border:1px solid #5a2a00;border-radius:7px;
+  padding:8px 12px;font-size:0.7rem;color:var(--orange);text-align:center;
+  cursor:pointer;margin-bottom:16px;transition:border-color .15s,background .15s;
+}
+.iel:hover .guard-indicator{background:#5a2a0050;border-color:var(--orange);}
+
+/* ── TOOLTIP ── */
+/* Tooltip: make long content scrollable and interactive */
+.tt{
+  display:none;
+  position:absolute;
+  z-index:9999;
+  width:420px;
+  max-height:320px;
+  background:#0d1117;
+  border:1.5px solid var(--accent);
+  border-radius:10px;
+  padding:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  box-shadow:0 20px 60px rgba(0,0,0,.8),0 0 0 1px rgba(79,142,247,.1);
+  pointer-events:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(124,92,252,0.5) transparent;
+}
+
+/* Styled scrollbars for WebKit browsers */
+.tt::-webkit-scrollbar{width:10px;height:10px}
+.tt::-webkit-scrollbar-track{background:transparent;border-radius:6px}
+.tt::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,rgba(124,92,252,0.18),rgba(79,142,247,0.28));
+  border-radius:8px;border:2px solid transparent;background-clip:padding-box;
+}
+.tt::-webkit-scrollbar-thumb:hover{
+  background:linear-gradient(180deg,rgba(124,92,252,0.28),rgba(79,142,247,0.44));
+}
+/* default: above, centered */
+.tt{bottom:calc(100% + 12px);left:50%;transform:translateX(-50%);}
+/* arrow pointing down */
+.tt::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:7px solid transparent;border-top-color:var(--accent);}
+
+/* variants */
+.tt-r{bottom:calc(100% + 12px);left:0;transform:none;}
+.tt-r::after{left:20px;transform:none;}
+.tt-l{bottom:calc(100% + 12px);left:auto;right:0;transform:none;}
+.tt-l::after{left:auto;right:20px;transform:none;}
+.tt-below{top:calc(100% + 12px);bottom:auto;left:50%;transform:translateX(-50%);}
+.tt-below::after{top:auto;bottom:100%;border-top-color:transparent;border-bottom-color:var(--accent);}
+
+.iel:hover .tt{display:block;}
+
+/* ── TOOLTIP SECTIONS: frontend / backend / db ── */
+.tt-section{padding:11px 14px;}
+.tt-section+.tt-section{border-top:1px solid var(--border);}
+.tt-section-fe{background:#0d1117;}
+.tt-section-be{background:#0d1220;}
+.tt-section-db{background:#0d120d;}
+
+.tt-section-head{
+  display:flex;align-items:center;gap:6px;
+  font-size:0.6rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  margin-bottom:6px;
+}
+.tt-section-head.fe{color:var(--accent2);}
+.tt-section-head.be{color:var(--accent3);}
+.tt-section-head.db{color:var(--pink);}
+.tt-section-badge{
+  font-size:0.55rem;font-weight:700;padding:1px 6px;border-radius:3px;
+}
+.tt-section-badge.fe{background:#2d1b4e;color:#c4b0ff;border:1px solid #3d2570;}
+.tt-section-badge.be{background:#0a2a30;color:var(--accent3);border:1px solid #0f3d45;}
+.tt-section-badge.db{background:#14352a;color:var(--green);border:1px solid #1e5040;}
+
+.tt-trigger{
+  display:inline-block;font-size:0.6rem;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;padding:2px 8px;background:var(--surface2);
+  border-radius:4px;color:var(--muted2);margin-bottom:5px;
+}
+.tt-fn{font-size:0.78rem;font-weight:800;font-family:monospace;margin-bottom:6px;}
+.tt-fn.fe{color:var(--accent2);}
+.tt-fn.be{color:var(--accent3);}
+.tt-fn.db{color:var(--pink);}
+.tt-steps{list-style:none;padding-top:0;}
+.tt-steps li{
+  font-size:0.68rem;color:var(--text);
+  padding:3px 0;display:flex;align-items:flex-start;gap:6px;
+  border-bottom:1px solid #1a1d2a;
+}
+.tt-steps li:last-child{border:none;}
+.tt-steps li::before{content:'▸';flex-shrink:0;}
+.tt-section-fe .tt-steps li::before{color:var(--accent2);}
+.tt-section-be .tt-steps li::before{color:var(--accent3);}
+.tt-section-db .tt-steps li::before{color:var(--pink);}
+.c-api{color:var(--yellow);font-family:monospace;font-size:0.64rem;}
+.c-ok{color:var(--green);}
+.c-err{color:var(--red);}
+.c-nav{color:var(--accent3);}
+.c-db{color:var(--pink);}
+.c-be{color:var(--accent3);font-family:monospace;font-size:0.64rem;}
+
+/* ── DATABASE ── */
+.db-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:24px;}
+.db-card{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;overflow:hidden;}
+.db-head{padding:14px 18px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;gap:10px;}
+.db-icon{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:0.9rem;}
+.db-name{font-size:0.9rem;font-weight:800;}
+.db-note{font-size:0.65rem;color:var(--muted);font-family:monospace;margin-top:1px;}
+.db-table{width:100%;border-collapse:collapse;}
+.db-table th{background:var(--surface3);padding:8px 14px;font-size:0.62rem;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border);text-align:left;}
+.db-table td{padding:8px 14px;font-size:0.71rem;border-bottom:1px solid var(--border);vertical-align:top;}
+.db-table tr:last-child td{border:none;}
+.db-table tr:hover td{background:var(--surface2);}
+.c-col{font-family:monospace;color:var(--text);font-weight:600;}
+.c-type{font-family:monospace;font-size:0.63rem;color:var(--accent3);}
+.c-pk{color:var(--yellow);font-size:0.6rem;font-weight:800;margin-left:4px;}
+.c-fk{color:var(--pink);font-size:0.6rem;font-weight:800;margin-left:4px;}
+.c-hash{color:var(--orange);font-size:0.63rem;font-weight:700;}
+.c-desc{font-size:0.63rem;color:var(--muted2);}
+.span2{grid-column:span 2;}
+
+/* ── FLOW ── */
+.flow-block{margin-bottom:32px;}
+.flow-label{font-size:0.68rem;font-weight:700;color:var(--muted2);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;}
+.flow-scroll{overflow-x:auto;padding-bottom:6px;}
+.flow-row{display:flex;align-items:center;gap:0;min-width:max-content;}
+.fn{background:var(--surface2);border:1.5px solid var(--border2);border-radius:9px;padding:9px 15px;font-size:0.73rem;font-weight:600;white-space:nowrap;}
+.fn-screen{border-color:var(--accent2);color:#c4b0ff;}
+.fn-api{border-color:var(--yellow);color:var(--yellow);}
+.fn-backend{border-color:var(--accent3);color:var(--accent3);}
+.fn-success{border-color:var(--green);color:var(--green);}
+.fn-error{border-color:var(--red);color:var(--red);}
+.farrow{font-size:1.1rem;color:var(--accent);padding:0 8px;flex-shrink:0;}
+.ftag{font-size:0.58rem;font-weight:700;padding:2px 6px;border-radius:3px;display:block;text-align:center;margin-bottom:3px;}
+.ft-route{background:#2d1b4e;color:#a78bfa;}
+.ft-api{background:#3d2a00;color:var(--yellow);}
+.ft-logic{background:#1e3a5f;color:var(--accent);}
+.ft-db{background:#14352a;color:var(--green);}
+.fstep{display:flex;flex-direction:column;align-items:center;}
+
+/* ── SECURITY ── */
+.sec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px;}
+.sec-item{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:14px;display:flex;gap:10px;}
+.sec-icon{width:30px;height:30px;background:#14352a;border:1.5px solid var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--green);font-size:0.8rem;flex-shrink:0;}
+.sec-lbl{font-size:0.8rem;font-weight:700;}
+.sec-desc{font-size:0.67rem;color:var(--muted2);margin-top:3px;}
+.sec-code{font-family:monospace;font-size:0.61rem;color:var(--accent);background:var(--surface2);padding:2px 6px;border-radius:4px;display:inline-block;margin-top:4px;}
+
+/* FOOTER */
+.footer{text-align:center;padding:32px;border-top:1px solid var(--border);color:var(--muted);font-size:0.72rem;margin-top:20px;}
+
+@media(max-width:700px){
+  .section{padding:32px 16px;}
+  .nav{padding:10px 16px;}
+  .site-header{padding:20px 16px;}
+  .screens-grid,.db-grid,.sec-grid{grid-template-columns:1fr;}
+  .span2{grid-column:span 1;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="site-header">
+  <div>
+    <h1>TodoAuth — Interactive UI Blueprint</h1>
+    <p>Hover any button, input, or link → see the function name + step-by-step logic inside</p>
+  </div>
+  <div class="header-badges">
+    <span class="badge badge-blue">.NET 10</span>
+    <span class="badge badge-purple">Angular 21</span>
+    <span class="badge badge-green">JWT + OTP</span>
+    <span class="badge badge-orange">Clean Architecture</span>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="#screens">📱 Screens (8)</a>
+  <a href="#database">🗄 Database Schema</a>
+  <a href="#flow">🔀 App Flow</a>
+  <a href="#security">🔒 Security</a>
+</nav>
+
+<!-- ══════════════════════════════════════════
+     SECTION 1 — SCREENS
+══════════════════════════════════════════ -->
+<div class="section" id="screens">
+  <div class="section-label">Section 01</div>
+  <div class="section-title">Screen UI Mockups — Interactive</div>
+  <div class="section-sub">8 screens — hover any element to see its function + logic. Password reset is split into 3 separate steps. APP_INITIALIZER restores sessions on refresh.</div>
+
+  <div class="hint-bar">
+    💡 <strong>How to use:</strong> Hover over any <span style="color:var(--accent)">input field</span>, <span style="color:#a78bfa">button</span>, <span style="color:var(--accent3)">link</span>, or <span style="color:var(--orange)">lifecycle indicator</span> to see the exact function name and logic that runs when you interact with it.
+  </div>
+
+  <div class="screens-grid">
+
+    <!-- ════ LOGIN ════ -->
+    <div class="screen-wrap">
+      <div class="screen-topbar">
+        <div class="screen-dots"><div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div></div>
+        <div class="screen-url">/login</div>
+        <div style="font-size:0.65rem;color:var(--muted2);">LoginComponent</div>
+      </div>
+      <div class="screen-body">
+        <div class="mock-card">
+          <div class="mock-h">Welcome back 👋</div>
+          <div class="mock-sub">Sign in to your TodoAuth account</div>
+
+          <div class="mock-field iel">
+            <div class="mock-lbl">Email Address</div>
+            <div class="mock-input">📧&nbsp; user@example.com</div>
+            <div class="tt tt-r">
+              <div class="tt-section tt-section-fe">
+                <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend</div>
+                <div class="tt-trigger">📝 Input · valueChanges</div>
+                <div class="tt-fn fe">loginForm.get('email')</div>
+                <ul class="tt-steps">
+                  <li>Validator: required + Validators.email</li>
+                  <li class="c-err">Shows "Valid email required" on blur if invalid</li>
+                  <li>Submit button [disabled]="form.invalid || isLoading"</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="mock-field iel">
+            <div class="mock-lbl">Password</div>
+            <div class="mock-input">🔒&nbsp; ••••••••</div>
+            <div class="tt tt-r">
+              <div class="tt-section tt-section-fe">
+                <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend</div>
+                <div class="tt-trigger">📝 Input · valueChanges</div>
+                <div class="tt-fn fe">loginForm.get('password')</div>
+                <ul class="tt-steps">
+                  <li>Validator: required + minLength(6)</li>
+                  <li class="c-err">Shows "Min 6 characters" on blur if too short</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="iel">
+            <button class="mock-btn btn-primary">Sign In</button>
+            <div class="tt">
+              <div class="tt-section tt-section-fe">
+                <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend — AuthService</div>
+                <div class="tt-trigger">🖱 onClick</div>
+                <div class="tt-fn fe">onLogin() → authService.login()</div>
+                <ul class="tt-steps">
+                  <li>loginForm.valid? → if false: markAllAsTouched() + stop</li>
+                  <li>Set isLoading = true, button disabled</li>
+                  <li class="c-api">POST /api/auth/login → { email, password }</li>
+                  <li class="c-ok">this.token = response.token (memory only, never localStorage)</li>
+                  <li class="c-ok">currentUserSignal.set({ email, roles })</li>
+                  <li class="c-nav">→ router.navigate(['/dashboard'])</li>
+                  <li class="c-err">400 requiresVerification: show banner + /verify-otp link</li>
+                  <li class="c-err">400/401: show "Invalid email or password"</li>
+                </ul>
+              </div>
+              <div class="tt-section tt-section-be">
+                <div class="tt-section-head be"><span class="tt-section-badge be">.NET</span> Backend — AuthEndpoints.cs</div>
+                <div class="tt-fn be">MapPost("/login") → AuthenticateUserCommandHandler.Handle()</div>
+                <ul class="tt-steps">
+                  <li class="c-be">userManager.FindByEmailAsync(email)</li>
+                  <li class="c-be">userManager.CheckPasswordAsync(user, password)</li>
+                  <li>If !user.IsVerified → 400 requiresVerification=true</li>
+                  <li class="c-be">_jwtGen.GenerateToken(user, roles) — HMAC-SHA256, 6h expiry</li>
+                  <li class="c-be">_jwtGen.GenerateRefreshToken() → Guid.NewGuid()</li>
+                  <li>SHA-256(refreshToken) → stored in user.RefreshToken</li>
+                  <li class="c-be">_userRepo.UpdateAsync(user) — saves hash + expiry (60d)</li>
+                  <li class="c-ok">CookieHelper.SetRefreshTokenCookie() → HttpOnly; Secure; SameSite=Strict</li>
+                </ul>
+              </div>
+              <div class="tt-section tt-section-db">
+                <div class="tt-section-head db"><span class="tt-section-badge db">SQL</span> Database — AspNetUsers</div>
+                <div class="tt-fn db">UserRepository.UpdateAsync() via UserManager</div>
+                <ul class="tt-steps">
+                  <li class="c-db">UPDATE AspNetUsers SET RefreshToken = SHA256Hash</li>
+                  <li class="c-db">UPDATE AspNetUsers SET RefreshTokenExpiresAt = UTC+60d</li>
+                  <li>PasswordHash is PBKDF2 — never compared as plaintext</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="iel">
+            <span class="mock-link">Forgot password?</span>
+            <div class="tt">
+              <div class="tt-section tt-section-fe">
+                <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend</div>
+                <div class="tt-fn fe">goToForgotPassword()</div>
+                <ul class="tt-steps"><li class="c-nav">→ router.navigate(['/forgot-password'])</li></ul>
+              </div>
+            </div>
+          </div>
+
+          <hr class="mock-divider"/>
+
+          <div class="iel">
+            <span class="mock-link">Don't have an account? Register →</span>
+            <div class="tt">
+              <div class="tt-section tt-section-fe">
+                <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend</div>
+                <div class="tt-fn fe">goToRegister()</div>
+                <ul class="tt-steps"><li class="c-nav">→ router.navigate(['/register'])</li></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ REGISTER ════ -->
+    <div class="screen-wrap">
+      <div class="screen-topbar">
+        <div class="screen-dots"><div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div></div>
+        <div class="screen-url">/register</div>
+        <div style="font-size:0.65rem;color:var(--muted2);">RegisterComponent</div>
+      </div>
+      <div class="screen-body">
+        <div class="mock-card">
+          <div class="mock-h">Create Account</div>
+          <div class="mock-sub">Email OTP verification required after signup</div>
+
+          <div class="mock-input-row">
+            <div class="mock-field iel">
+              <div class="mock-lbl">First Name</div>
+              <div class="mock-input">John</div>
+              <div class="tt tt-r">
+                <div class="tt-section tt-section-fe">
+                  <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend</div>
+                  <div class="tt-fn fe">registerForm.get('firstName')</div>
+                  <ul class="tt-steps"><li>required + minLength(2)</li></ul>
+                </div>
+              </div>
+            </div>
+            <div class="mock-field iel">
+              <div class="mock-lbl">Last Name</div>
+              <div class="mock-input">Doe</div>
+              <div class="tt tt-l">
+                <div class="tt-section tt-section-fe">
+                  <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend</div>
+                  <div class="tt-fn fe">registerForm.get('lastName')</div>
+                  <ul class="tt-steps"><li>required + minLength(2)</li></ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mock-field iel">
+            <div class="mock-lbl">Email Address</div>
+            <div class="mock-input">📧&nbsp; john@example.com</div>
+            <div class="tt tt-r">
+              <div class="tt-section tt-section-fe">
+                <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend</div>
+                <div class="tt-fn fe">registerForm.get('email')</div>
+                <ul class="tt-steps"><li>required + Validators.email</li><li class="c-err">Shows "Invalid email format"</li></ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="mock-field iel">
+            <div class="mock-lbl">Password</div>
+            <div class="mock-input">🔒&nbsp; ••••••••</div>
+            <div class="tt tt-r">
+              <div class="tt-section tt-section-fe">
+                <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend</div>
+                <div class="tt-fn fe">registerForm.get('password')</div>
+                <ul class="tt-steps"><li>required + minLength(8)</li><li>On change → triggers confirmPassword re-validate</li></ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="mock-field iel">
+            <div class="mock-lbl">Confirm Password</div>
+            <div class="mock-input">🔒&nbsp; ••••••••</div>
+            <div class="tt tt-r">
+              <div class="tt-section tt-section-fe">
+                <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend</div>
+                <div class="tt-fn fe">passwordMatchValidator (FormGroup validator)</div>
+                <ul class="tt-steps">
+                  <li>Custom FormGroup validator on every keystroke</li>
+                  <li>Compares password vs confirmPassword values</li>
+                  <li class="c-err">Mismatch → group error { passwordMismatch: true }</li>
+                  <li class="c-err">Shows red "Passwords do not match" hint below field</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="iel">
+            <button class="mock-btn btn-primary">Create Account</button>
+            <div class="tt">
+              <div class="tt-section tt-section-fe">
+                <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend — AuthService</div>
+                <div class="tt-trigger">🖱 onClick</div>
+                <div class="tt-fn fe">onRegister() → authService.register()</div>
+                <ul class="tt-steps">
+                  <li>registerForm.valid? → if false: markAllAsTouched() + stop</li>
+                  <li>Set isLoading = true</li>
+                  <li class="c-api">POST /api/auth/register → { email, password, firstName, lastName }</li>
+                  <li class="c-ok">Response: { message, requiresVerification: true }</li>
+                  <li class="c-nav">→ router.navigate(['/verify-otp'], { queryParams: { email } })</li>
+                  <li class="c-err">On "email already exists": show error toast</li>
+                </ul>
+              </div>
+              <div class="tt-section tt-section-be">
+                <div class="tt-section-head be"><span class="tt-section-badge be">.NET</span> Backend — RegisterUserCommandHandler.Handle()</div>
+                <div class="tt-fn be">MapPost("/register") → RegisterUserCommandHandler</div>
+                <ul class="tt-steps">
+                  <li class="c-be">_userRepo.FindByEmailAsync(email) → if exists: throw AuthException</li>
+                  <li class="c-be">_userRepo.CreateAsync(user, password) → UserManager.CreateAsync()</li>
+                  <li class="c-be">_userRepo.AddToRoleAsync(user, "User")</li>
+                  <li class="c-be">_otpService.GenerateOTPAsync(email, "Registration")</li>
+                  <li>RandomNumberGenerator.GetInt32(100000,1000000) — CSPRNG</li>
+                  <li>SHA-256(otp) → stored as OTPHash in EmailVerifications</li>
+                  <li class="c-be">_emailService.SendVerificationEmailAsync(email, plainOTP)</li>
+                </ul>
+              </div>
+              <div class="tt-section tt-section-db">
+                <div class="tt-section-head db"><span class="tt-section-badge db">SQL</span> Database — AspNetUsers + EmailVerifications</div>
+                <div class="tt-fn db">UserRepository.CreateAsync() + OTPService.GenerateOTPAsync()</div>
+                <ul class="tt-steps">
+                  <li class="c-db">INSERT INTO AspNetUsers (Email, PasswordHash[PBKDF2], FirstName, LastName, IsVerified=false, CreatedAt=UTC)</li>
+                  <li class="c-db">INSERT INTO AspNetUserRoles (UserId, RoleId) — "User" role</li>
+                  <li class="c-db">DELETE FROM EmailVerifications WHERE Email=email AND Purpose="Registration"</li>
+                  <li class="c-db">INSERT INTO EmailVerifications (Id=Guid, Email, OTPHash=SHA256, ExpiresAt=UTC+10m, Purpose="Registration", RequestCount=1)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <hr class="mock-divider"/>
+          <div class="iel">
+            <span class="mock-link">Already have an account? Login →</span>
+            <div class="tt">
+              <div class="tt-section tt-section-fe">
+                <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend</div>
+                <div class="tt-fn fe">goToLogin()</div>
+                <ul class="tt-steps"><li class="c-nav">→ router.navigate(['/login'])</li></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ VERIFY OTP ════ -->
+    <div class="screen-wrap">
+      <div class="screen-topbar">
+        <div class="screen-dots"><div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div></div>
+        <div class="screen-url">/verify-otp?email=…</div>
+        <div style="font-size:0.65rem;color:var(--muted2);">VerifyOtpComponent</div>
+      </div>
+      <div class="screen-body">
+        <div class="mock-card">
+          <div class="mock-h">Verify Your Email</div>
+          <div class="mock-sub">Code sent to <span style="color:var(--accent)">john@example.com</span></div>
+          <div class="mock-alert alert-info">📧 OTP expires in 10 minutes</div>
+
+          <div class="iel">
+            <div class="init-indicator">⚙ Component initializing — reading URL params…</div>
+            <div class="tt tt-r">
+              <div class="tt-section tt-section-fe">
+                <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend — VerifyOtpComponent</div>
+                <div class="tt-trigger">⚙ ngOnInit (auto, on component load)</div>
+                <div class="tt-fn fe">ngOnInit()</div>
+                <ul class="tt-steps">
+                  <li>route.queryParams.subscribe(params => this.email = params['email'])</li>
+                  <li class="c-err">If !email → router.navigate(['/register'])</li>
+                  <li>Store email for display + API calls</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="mock-field">
+            <div class="mock-lbl">6-Digit OTP Code</div>
+            <div class="iel">
+              <div class="mock-otp">1&nbsp;2&nbsp;3&nbsp;4&nbsp;5&nbsp;6</div>
+              <div class="tt">
+                <div class="tt-section tt-section-fe">
+                  <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend</div>
+                  <div class="tt-fn fe">otpForm.get('otp')</div>
+                  <ul class="tt-steps">
+                    <li>required + minLength(6) + maxLength(6)</li>
+                    <li>pattern: /^\d{6}$/ — digits only</li>
+                    <li class="c-err">Shows "Must be exactly 6 digits"</li>
+                    <li>Submit disabled while form.invalid</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="iel">
+            <button class="mock-btn btn-primary">Verify OTP</button>
+            <div class="tt">
+              <div class="tt-section tt-section-fe">
+                <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend — AuthService</div>
+                <div class="tt-trigger">🖱 onClick</div>
+                <div class="tt-fn fe">onVerifyOTP() → authService.verifyOTP()</div>
+                <ul class="tt-steps">
+                  <li>otpForm.valid? → stop if not</li>
+                  <li>Set isLoading = true</li>
+                  <li class="c-api">POST /api/auth/verify-otp → { email, otp }, withCredentials:true</li>
+                  <li class="c-ok">this.token = response.token (memory only)</li>
+                  <li class="c-ok">currentUserSignal.set({ email, roles })</li>
+                  <li class="c-nav">→ router.navigate(['/dashboard'])</li>
+                  <li class="c-err">400 "Invalid/expired OTP": clear OTP field, show error</li>
+                </ul>
+              </div>
+              <div class="tt-section tt-section-be">
+                <div class="tt-section-head be"><span class="tt-section-badge be">.NET</span> Backend — VerifyOTPCommandHandler.Handle()</div>
+                <div class="tt-fn be">MapPost("/verify-otp") → VerifyOTPCommandHandler</div>
+                <ul class="tt-steps">
+                  <li class="c-be">_otpService.VerifyOTPAsync(email, otp, "Registration")</li>
+                  <li>SHA-256(incomingOTP) → compare with stored OTPHash</li>
+                  <li>ExpiresAt &lt; UTC? → delete record, return false</li>
+                  <li class="c-be">_userRepo.FindByEmailAsync(email)</li>
+                  <li>user.IsVerified = true; user.VerifiedAt = UTC</li>
+                  <li class="c-be">_jwtGen.GenerateToken(user, roles) + GenerateRefreshToken()</li>
+                  <li>SHA-256(refreshToken) → user.RefreshToken hash</li>
+                  <li class="c-be">_userRepo.UpdateAsync(user)</li>
+                  <li class="c-ok">CookieHelper.SetRefreshTokenCookie() → HttpOnly Secure cookie</li>
+                </ul>
+              </div>
+              <div class="tt-section tt-section-db">
+                <div class="tt-section-head db"><span class="tt-section-badge db">SQL</span> Database — EmailVerifications + AspNetUsers</div>
+                <div class="tt-fn db">OTPService.VerifyOTPAsync() + UserRepository.UpdateAsync()</div>
+                <ul class="tt-steps">
+                  <li class="c-db">SELECT EmailVerifications WHERE Email=email AND OTPHash=hash AND Purpose="Registration"</li>
+                  <li class="c-db">UPDATE EmailVerifications SET IsVerified=true</li>
+                  <li class="c-db">UPDATE AspNetUsers SET IsVerified=true, VerifiedAt=UTC</li>
+                  <li class="c-db">UPDATE AspNetUsers SET RefreshToken=SHA256Hash, RefreshTokenExpiresAt=UTC+60d</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;">
+            <div class="iel">
+              <button class="btn-ghost">🔄 Resend OTP</button>
+              <div class="tt tt-r">
+                <div class="tt-section tt-section-fe">
+                  <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend — AuthService</div>
+                  <div class="tt-fn fe">onResendOTP() → authService.resendOTP()</div>
+                  <ul class="tt-steps">
+                    <li>resendCooldown > 0? → show countdown, return</li>
+                    <li>Set isResending = true</li>
+                    <li class="c-api">POST /api/auth/resend-otp → { email, purpose:"Registration" }</li>
+                    <li class="c-ok">Show "New OTP sent to your inbox!"</li>
+                    <li>Start 60s countdown — button disabled until 0</li>
+                    <li class="c-err">429: "Too many requests. Wait 1 hour."</li>
+                  </ul>
+                </div>
+                <div class="tt-section tt-section-be">
+                  <div class="tt-section-head be"><span class="tt-section-badge be">.NET</span> Backend — ResendOTPCommandHandler.Handle()</div>
+                  <div class="tt-fn be">MapPost("/resend-otp") → ResendOTPCommandHandler</div>
+                  <ul class="tt-steps">
+                    <li class="c-be">_otpService.IsRateLimitedAsync(email) → count >= 3 in last 1hr? → throw 429</li>
+                    <li class="c-be">_otpService.GenerateOTPAsync(email, "Registration")</li>
+                    <li>RandomNumberGenerator.GetInt32(100000,1000000) — CSPRNG</li>
+                    <li>SHA-256(newOtp) → new OTPHash stored</li>
+                    <li class="c-be">_emailService.SendVerificationEmailAsync(email, plainOTP)</li>
+                  </ul>
+                </div>
+                <div class="tt-section tt-section-db">
+                  <div class="tt-section-head db"><span class="tt-section-badge db">SQL</span> Database — EmailVerifications</div>
+                  <div class="tt-fn db">OTPService.GenerateOTPAsync() + IsRateLimitedAsync()</div>
+                  <ul class="tt-steps">
+                    <li class="c-db">SELECT COUNT(*) WHERE Email=email AND LastRequestAt > UTC-1hr → if ≥3: reject</li>
+                    <li class="c-db">DELETE FROM EmailVerifications WHERE Email=email AND Purpose="Registration"</li>
+                    <li class="c-db">INSERT INTO EmailVerifications (OTPHash=SHA256, ExpiresAt=UTC+10m, RequestCount++, LastRequestAt=UTC)</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div style="font-size:0.65rem;color:var(--muted);">Max 3/hour</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ FORGOT PASSWORD ════ -->
+    <div class="screen-wrap">
+      <div class="screen-topbar">
+        <div class="screen-dots"><div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div></div>
+        <div class="screen-url">/forgot-password</div>
+        <div style="font-size:0.65rem;color:var(--muted2);">ForgotPasswordComponent</div>
+      </div>
+      <div class="screen-body">
+        <div class="mock-card">
+          <div class="mock-h">Reset Password</div>
+          <div class="mock-sub">Enter your email — we'll send a reset OTP</div>
+
+          <div class="mock-field iel">
+            <div class="mock-lbl">Email Address</div>
+            <div class="mock-input">📧&nbsp; john@example.com</div>
+            <div class="tt tt-r">
+              <div class="tt-section tt-section-fe">
+                <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend</div>
+                <div class="tt-fn fe">forgotForm.get('email')</div>
+                <ul class="tt-steps"><li>required + Validators.email</li><li class="c-err">"Valid email required"</li></ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="iel">
+            <button class="mock-btn btn-primary">Send Reset OTP</button>
+            <div class="tt">
+              <div class="tt-section tt-section-fe">
+                <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend — AuthService</div>
+                <div class="tt-trigger">🖱 onClick</div>
+                <div class="tt-fn fe">onRequestReset() → authService.requestPasswordReset()</div>
+                <ul class="tt-steps">
+                  <li>forgotForm.valid? → stop if not</li>
+                  <li>Set isLoading = true</li>
+                  <li class="c-api">POST /api/auth/request-password-reset → { email }</li>
+                  <li class="c-ok">Show success: "OTP sent to your email"</li>
+                  <li class="c-nav">→ router.navigate(['/reset-password'], { queryParams:{ email } })</li>
+                  <li class="c-err">400: generic "If an account exists, OTP was sent"</li>
+                  <li class="c-err">429: "Too many requests. Wait 1 hour."</li>
+                </ul>
+              </div>
+              <div class="tt-section tt-section-be">
+                <div class="tt-section-head be"><span class="tt-section-badge be">.NET</span> Backend — RequestPasswordResetCommandHandler.Handle()</div>
+                <div class="tt-fn be">MapPost("/request-password-reset") → RequestPasswordResetCommandHandler</div>
+                <ul class="tt-steps">
+                  <li class="c-be">_userRepo.FindByEmailAsync(email) → if null: return generic 200 (no enumeration)</li>
+                  <li class="c-be">_otpService.IsRateLimitedAsync(email) → if limited: throw 429</li>
+                  <li class="c-be">_otpService.GenerateOTPAsync(email, "PasswordReset")</li>
+                  <li>RandomNumberGenerator.GetInt32(100000,1000000) — CSPRNG, SHA-256 before storage</li>
+                  <li class="c-be">_emailService.SendPasswordResetEmailAsync(email, plainOTP)</li>
+                </ul>
+              </div>
+              <div class="tt-section tt-section-db">
+                <div class="tt-section-head db"><span class="tt-section-badge db">SQL</span> Database — EmailVerifications</div>
+                <div class="tt-fn db">OTPService.GenerateOTPAsync(email, "PasswordReset")</div>
+                <ul class="tt-steps">
+                  <li class="c-db">SELECT COUNT(*) WHERE Email=email AND LastRequestAt > UTC-1hr → rate limit check</li>
+                  <li class="c-db">DELETE FROM EmailVerifications WHERE Email=email AND Purpose="PasswordReset"</li>
+                  <li class="c-db">INSERT INTO EmailVerifications (OTPHash=SHA256, ExpiresAt=UTC+10m, Purpose="PasswordReset", RequestCount=1)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <hr class="mock-divider"/>
+          <div class="iel">
+            <span class="mock-link">← Back to Login</span>
+            <div class="tt">
+              <div class="tt-section tt-section-fe">
+                <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend</div>
+                <div class="tt-fn fe">goToLogin()</div>
+                <ul class="tt-steps"><li class="c-nav">→ router.navigate(['/login'])</li></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ RESET PASSWORD — STEP 2: OTP VERIFY ════ -->
+    <div class="screen-wrap">
+      <div class="screen-topbar">
+        <div class="screen-dots"><div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div></div>
+        <div class="screen-url">/reset-password?email=…</div>
+        <div style="font-size:0.65rem;color:var(--muted2);">ResetPasswordComponent</div>
+      </div>
+      <div class="screen-body">
+        <div class="mock-card">
+          <div class="mock-h">Verify OTP</div>
+          <div class="mock-sub">Enter the 6-digit code sent to <span style="color:var(--accent)">your email</span></div>
+          <div class="mock-alert alert-info">📧 OTP expires in 10 minutes</div>
+
+          <!-- Step badge -->
+          <div style="display:flex;gap:8px;margin-bottom:14px;">
+            <div style="flex:1;text-align:center;padding:5px;border-radius:6px;background:#1e3a5f;border:1px solid var(--accent);font-size:0.65rem;color:var(--accent);font-weight:700;">① Email sent ✓</div>
+            <div style="flex:1;text-align:center;padding:5px;border-radius:6px;background:var(--surface3);border:1px solid var(--accent);font-size:0.65rem;color:var(--accent);font-weight:700;">② Verify OTP ←</div>
+            <div style="flex:1;text-align:center;padding:5px;border-radius:6px;background:var(--surface3);border:1px solid var(--border2);font-size:0.65rem;color:var(--muted);font-weight:700;">③ New Password</div>
+          </div>
+
+          <div class="iel">
+            <div class="init-indicator">⚙ Reading email from URL params…</div>
+            <div class="tt tt-r">
+              <div class="tt-section tt-section-fe">
+                <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend — ResetPasswordComponent</div>
+                <div class="tt-trigger">⚙ ngOnInit (auto on load)</div>
+                <div class="tt-fn fe">ngOnInit()</div>
+                <ul class="tt-steps">
+                  <li>route.queryParams → this.email = params['email']</li>
+                  <li class="c-err">If !email → router.navigate(['/forgot-password'])</li>
+                  <li>Store email in component for display + API calls</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="mock-field">
+            <div class="mock-lbl">6-Digit OTP Code</div>
+            <div class="iel">
+              <div class="mock-otp">1&nbsp;2&nbsp;3&nbsp;4&nbsp;5&nbsp;6</div>
+              <div class="tt">
+                <div class="tt-section tt-section-fe">
+                  <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend</div>
+                  <div class="tt-fn fe">otpResetForm.get('otp')</div>
+                  <ul class="tt-steps">
+                    <li>required + minLength(6) + maxLength(6)</li>
+                    <li>pattern: /^\d{6}$/ — digits only</li>
+                    <li class="c-err">"Must be exactly 6 digits"</li>
+                    <li>Verify button disabled while form.invalid</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="iel">
+            <button class="mock-btn btn-primary">Verify OTP</button>
+            <div class="tt">
+              <div class="tt-section tt-section-fe">
+                <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend — AuthService</div>
+                <div class="tt-trigger">🖱 onClick</div>
+                <div class="tt-fn fe">onVerifyResetOTP() → authService.verifyResetOtp()</div>
+                <ul class="tt-steps">
+                  <li>otpResetForm.valid? → stop if not</li>
+                  <li>Set isLoading = true</li>
+                  <li class="c-api">POST /api/auth/verify-reset-otp → { email, otp }</li>
+                  <li class="c-ok">this.resetToken = response.resetToken (service state, never in URL)</li>
+                  <li class="c-nav">→ router.navigate(['/new-password'], { queryParams: { email } })</li>
+                  <li class="c-err">400 "Invalid/expired OTP": clear OTP field, show error message</li>
+                </ul>
+              </div>
+              <div class="tt-section tt-section-be">
+                <div class="tt-section-head be"><span class="tt-section-badge be">.NET</span> Backend — VerifyResetOtpCommandHandler.Handle()</div>
+                <div class="tt-fn be">MapPost("/verify-reset-otp") → VerifyResetOtpCommandHandler</div>
+                <ul class="tt-steps">
+                  <li class="c-be">_otpService.VerifyOTPAsync(email, otp, "PasswordReset")</li>
+                  <li>SHA-256(incomingOTP) → compare with stored OTPHash, check ExpiresAt</li>
+                  <li class="c-be">_userRepo.FindByEmailAsync(email)</li>
+                  <li>plainResetToken = Guid.NewGuid().ToString("N")</li>
+                  <li>SHA-256(plainResetToken) → user.PasswordResetToken hash</li>
+                  <li>user.PasswordResetTokenExpiresAt = UTC+15min (short-lived)</li>
+                  <li class="c-be">_userRepo.UpdateAsync(user) — saves hash + expiry</li>
+                  <li class="c-ok">Returns plainResetToken to Angular (stored in service state)</li>
+                </ul>
+              </div>
+              <div class="tt-section tt-section-db">
+                <div class="tt-section-head db"><span class="tt-section-badge db">SQL</span> Database — EmailVerifications + AspNetUsers</div>
+                <div class="tt-fn db">OTPService.VerifyOTPAsync() + UserRepository.UpdateAsync()</div>
+                <ul class="tt-steps">
+                  <li class="c-db">SELECT EmailVerifications WHERE Email=email AND OTPHash=SHA256Hash AND Purpose="PasswordReset"</li>
+                  <li class="c-db">UPDATE EmailVerifications SET IsVerified=true</li>
+                  <li class="c-db">UPDATE AspNetUsers SET PasswordResetToken=SHA256Hash, PasswordResetTokenExpiresAt=UTC+15m</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;">
+            <div class="iel">
+              <button class="btn-ghost">🔄 Resend OTP</button>
+              <div class="tt tt-r">
+                <div class="tt-section tt-section-fe">
+                  <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend — AuthService</div>
+                  <div class="tt-fn fe">onResendOTP() → authService.resendOTP()</div>
+                  <ul class="tt-steps">
+                    <li>resendCooldown > 0? → show countdown, return</li>
+                    <li>Set isResending = true</li>
+                    <li class="c-api">POST /api/auth/resend-otp → { email, purpose:"PasswordReset" }</li>
+                    <li class="c-ok">Show "New OTP sent to your inbox!"</li>
+                    <li>Start 60s cooldown — button disabled</li>
+                    <li class="c-err">429: "Too many requests. Wait 1 hour."</li>
+                  </ul>
+                </div>
+                <div class="tt-section tt-section-be">
+                  <div class="tt-section-head be"><span class="tt-section-badge be">.NET</span> Backend — ResendOTPCommandHandler.Handle()</div>
+                  <div class="tt-fn be">MapPost("/resend-otp") → ResendOTPCommandHandler</div>
+                  <ul class="tt-steps">
+                    <li class="c-be">_otpService.IsRateLimitedAsync(email) → ≥3 in last 1hr → throw 429</li>
+                    <li class="c-be">_otpService.GenerateOTPAsync(email, "PasswordReset")</li>
+                    <li>RandomNumberGenerator.GetInt32(100000,1000000) — CSPRNG</li>
+                    <li class="c-be">_emailService.SendPasswordResetEmailAsync(email, plainOTP)</li>
+                  </ul>
+                </div>
+                <div class="tt-section tt-section-db">
+                  <div class="tt-section-head db"><span class="tt-section-badge db">SQL</span> Database — EmailVerifications</div>
+                  <div class="tt-fn db">OTPService.GenerateOTPAsync(email, "PasswordReset")</div>
+                  <ul class="tt-steps">
+                    <li class="c-db">SELECT COUNT(*) WHERE Email=email AND LastRequestAt > UTC-1hr → rate limit</li>
+                    <li class="c-db">DELETE FROM EmailVerifications WHERE Email=email AND Purpose="PasswordReset"</li>
+                    <li class="c-db">INSERT INTO EmailVerifications (OTPHash=SHA256, ExpiresAt=UTC+10m, RequestCount++)</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div style="font-size:0.65rem;color:var(--muted);">Max 3/hour</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ RESET PASSWORD — STEP 3: NEW PASSWORD ════ -->
+    <div class="screen-wrap">
+      <div class="screen-topbar">
+        <div class="screen-dots"><div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div></div>
+        <div class="screen-url">/new-password?email=…</div>
+        <div style="font-size:0.65rem;color:var(--muted2);">NewPasswordComponent</div>
+      </div>
+      <div class="screen-body">
+        <div class="mock-card">
+          <div class="mock-h">Set New Password</div>
+          <div class="mock-sub">OTP verified ✓ — choose your new password</div>
+
+          <!-- Step badge -->
+          <div style="display:flex;gap:8px;margin-bottom:14px;">
+            <div style="flex:1;text-align:center;padding:5px;border-radius:6px;background:#1e3a5f;border:1px solid var(--accent);font-size:0.65rem;color:var(--accent);font-weight:700;">① Email sent ✓</div>
+            <div style="flex:1;text-align:center;padding:5px;border-radius:6px;background:#1e3a5f;border:1px solid var(--accent);font-size:0.65rem;color:var(--accent);font-weight:700;">② OTP verified ✓</div>
+            <div style="flex:1;text-align:center;padding:5px;border-radius:6px;background:var(--surface3);border:1px solid var(--accent);font-size:0.65rem;color:var(--accent);font-weight:700;">③ New Password ←</div>
+          </div>
+
+          <div class="iel">
+            <div class="init-indicator">⚙ Reading email from URL + resetToken from service state…</div>
+            <div class="tt tt-r">
+              <div class="tt-section tt-section-fe">
+                <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend — NewPasswordComponent</div>
+                <div class="tt-trigger">⚙ ngOnInit (auto on load)</div>
+                <div class="tt-fn fe">ngOnInit()</div>
+                <ul class="tt-steps">
+                  <li>Read email from route.queryParams</li>
+                  <li>Read resetToken from authService.getResetToken() — never exposed in URL</li>
+                  <li class="c-err">If !email or !resetToken → router.navigate(['/forgot-password'])</li>
+                  <li>resetToken is short-lived, single-use — authorizes password change</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="mock-field iel">
+            <div class="mock-lbl">New Password</div>
+            <div class="mock-input">🔒&nbsp; ••••••••</div>
+            <div class="tt tt-r">
+              <div class="tt-section tt-section-fe">
+                <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend</div>
+                <div class="tt-fn fe">newPasswordForm.get('newPassword')</div>
+                <ul class="tt-steps">
+                  <li>required + minLength(8)</li>
+                  <li class="c-err">"Password must be at least 8 characters"</li>
+                  <li>On change → triggers confirmPassword re-validate</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="mock-field iel">
+            <div class="mock-lbl">Confirm New Password</div>
+            <div class="mock-input">🔒&nbsp; ••••••••</div>
+            <div class="tt tt-r">
+              <div class="tt-section tt-section-fe">
+                <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend</div>
+                <div class="tt-fn fe">passwordMatchValidator (FormGroup validator)</div>
+                <ul class="tt-steps">
+                  <li>Custom FormGroup validator: compares newPassword vs confirmPassword on every keystroke</li>
+                  <li class="c-err">Mismatch → group error { passwordMismatch: true }</li>
+                  <li class="c-err">Shows red "Passwords do not match" hint</li>
+                  <li>Submit button disabled while form.invalid</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="iel">
+            <button class="mock-btn btn-primary">Save New Password</button>
+            <div class="tt">
+              <div class="tt-section tt-section-fe">
+                <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend — AuthService</div>
+                <div class="tt-trigger">🖱 onClick</div>
+                <div class="tt-fn fe">onSaveNewPassword() → authService.resetPassword()</div>
+                <ul class="tt-steps">
+                  <li>newPasswordForm.valid? → stop if not (markAllAsTouched)</li>
+                  <li>Set isLoading = true</li>
+                  <li class="c-api">POST /api/auth/reset-password → { email, resetToken, newPassword }</li>
+                  <li class="c-ok">Show success toast: "Password changed successfully!"</li>
+                  <li class="c-nav">→ router.navigate(['/login'])</li>
+                  <li class="c-err">400 "Invalid/expired token": redirect to /forgot-password</li>
+                </ul>
+              </div>
+              <div class="tt-section tt-section-be">
+                <div class="tt-section-head be"><span class="tt-section-badge be">.NET</span> Backend — ResetPasswordCommandHandler.Handle()</div>
+                <div class="tt-fn be">MapPost("/reset-password") → ResetPasswordCommandHandler</div>
+                <ul class="tt-steps">
+                  <li class="c-be">_userRepo.FindByEmailAsync(email)</li>
+                  <li>SHA-256(incomingResetToken) → compare with user.PasswordResetToken hash</li>
+                  <li>PasswordResetTokenExpiresAt &lt; UTC → throw "Reset token expired"</li>
+                  <li class="c-be">_passwordHasher.HashPassword(user, newPassword) — PBKDF2</li>
+                  <li>user.PasswordResetToken = null; user.PasswordResetTokenExpiresAt = null</li>
+                  <li class="c-be">_userRepo.UpdateAsync(user) — saves new password hash</li>
+                  <li class="c-be">_dbContext.EmailVerifications.Remove(otpRecord)</li>
+                  <li class="c-be">_dbContext.SaveChangesAsync()</li>
+                </ul>
+              </div>
+              <div class="tt-section tt-section-db">
+                <div class="tt-section-head db"><span class="tt-section-badge db">SQL</span> Database — AspNetUsers + EmailVerifications</div>
+                <div class="tt-fn db">UserRepository.UpdateAsync() + DbContext.SaveChangesAsync()</div>
+                <ul class="tt-steps">
+                  <li class="c-db">UPDATE AspNetUsers SET PasswordHash=PBKDF2(newPassword), PasswordResetToken=NULL, PasswordResetTokenExpiresAt=NULL</li>
+                  <li class="c-db">DELETE FROM EmailVerifications WHERE Email=email AND Purpose="PasswordReset"</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ APP INITIALIZER — Session Restoration ════ -->
+    <div class="screen-wrap">
+      <div class="screen-topbar">
+        <div class="screen-dots"><div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div></div>
+        <div class="screen-url">/ (app startup)</div>
+        <div style="font-size:0.65rem;color:var(--muted2);">APP_INITIALIZER</div>
+      </div>
+      <div class="screen-body">
+        <div class="mock-card">
+          <div class="mock-h">Session Restoration</div>
+          <div class="mock-sub">Runs once on startup — before any route guard or component renders</div>
+
+          <!-- isInitialized signal visual -->
+          <div style="background:var(--surface3);border:1px solid var(--border2);border-radius:8px;padding:12px;margin-bottom:13px;">
+            <div class="mock-lbl">Angular Signal — authService.isInitialized</div>
+            <div style="display:flex;gap:10px;align-items:center;">
+              <div style="flex:1;background:var(--surface2);border:1px solid var(--orange);border-radius:6px;padding:8px;text-align:center;">
+                <div style="font-size:0.82rem;font-weight:800;color:var(--orange);">false</div>
+                <div style="font-size:0.6rem;color:var(--muted2);margin-top:2px;">app bootstrapping</div>
+              </div>
+              <div style="color:var(--accent);font-size:1rem;flex-shrink:0;">→</div>
+              <div style="flex:1;background:var(--surface2);border:1px solid var(--green);border-radius:6px;padding:8px;text-align:center;">
+                <div style="font-size:0.82rem;font-weight:800;color:var(--green);">true</div>
+                <div style="font-size:0.6rem;color:var(--muted2);margin-top:2px;">init complete</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="iel">
+            <div class="init-indicator">⚙ APP_INITIALIZER — blocks bootstrap until Promise resolves</div>
+            <div class="tt tt-r">
+              <div class="tt-section tt-section-fe">
+                <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend — AuthService (app.config.ts)</div>
+                <div class="tt-trigger">⚙ APP_INITIALIZER (auto, before app renders)</div>
+                <div class="tt-fn fe">authService.initializeAuth() — returns Promise&lt;void&gt;</div>
+                <ul class="tt-steps">
+                  <li>Registered via APP_INITIALIZER in app.config.ts — runs before any route or guard</li>
+                  <li>http.post('/api/auth/refresh', {}, { withCredentials:true }) — browser auto-sends HttpOnly cookie</li>
+                  <li class="c-ok">tap: this.token = response.token; currentUserSignal.set({ email, roles })</li>
+                  <li class="c-err">catchError: token = null, currentUserSignal.set(null) — silent</li>
+                  <li>finally: isInitializedSignal.set(true) — always fires</li>
+                </ul>
+              </div>
+              <div class="tt-section tt-section-be">
+                <div class="tt-section-head be"><span class="tt-section-badge be">.NET</span> Backend — RefreshTokenCommandHandler.Handle()</div>
+                <div class="tt-fn be">MapPost("/refresh") → RefreshTokenCommandHandler</div>
+                <ul class="tt-steps">
+                  <li>Read plainRefreshToken from HttpOnly cookie</li>
+                  <li class="c-be">SHA-256(plainToken) → scan AspNetUsers for matching RefreshToken hash</li>
+                  <li>RefreshTokenExpiresAt &lt; UTC? → throw "Refresh token expired"</li>
+                  <li class="c-be">_jwtGen.GenerateToken(user, roles) — new JWT (6h)</li>
+                  <li class="c-be">_jwtGen.GenerateRefreshToken() → new Guid</li>
+                  <li>SHA-256(newGuid) → user.RefreshToken hash rotated</li>
+                  <li class="c-be">_userRepo.UpdateAsync(user)</li>
+                  <li class="c-ok">CookieHelper.SetRefreshTokenCookie() — new HttpOnly Secure cookie</li>
+                </ul>
+              </div>
+              <div class="tt-section tt-section-db">
+                <div class="tt-section-head db"><span class="tt-section-badge db">SQL</span> Database — AspNetUsers</div>
+                <div class="tt-fn db">UserRepository.UpdateAsync() — token rotation</div>
+                <ul class="tt-steps">
+                  <li class="c-db">SELECT AspNetUsers WHERE RefreshToken = SHA256(incomingToken)</li>
+                  <li class="c-db">UPDATE AspNetUsers SET RefreshToken=SHA256(newGuid), RefreshTokenExpiresAt=UTC+60d</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- app.config.ts code snippet -->
+          <div style="background:#0d1117;border:1px solid var(--border2);border-radius:7px;padding:12px;margin-bottom:13px;font-family:monospace;font-size:0.65rem;line-height:1.85;">
+            <div style="color:var(--muted);font-size:0.58rem;margin-bottom:5px;">// app.config.ts</div>
+            <div><span style="color:var(--accent2);">provide</span><span style="color:var(--text);">: APP_INITIALIZER,</span></div>
+            <div><span style="color:var(--accent2);">useFactory</span><span style="color:var(--text);">: (auth: AuthService) =&gt;</span></div>
+            <div style="padding-left:1.2em;"><span style="color:var(--green);">() =&gt; auth.initializeAuth()</span><span style="color:var(--text);">,</span></div>
+            <div><span style="color:var(--accent2);">deps</span><span style="color:var(--text);">: [AuthService],&nbsp;</span><span style="color:var(--accent2);">multi</span><span style="color:var(--text);">: true</span></div>
+          </div>
+
+          <div class="iel">
+            <div class="guard-indicator">🛡 All route guards subscribe to isInitialized before acting</div>
+            <div class="tt tt-r">
+              <div class="tt-section tt-section-fe">
+                <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend — authorize.guard.ts</div>
+                <div class="tt-trigger">⚙ authorizeGuard.canActivate() — called by router</div>
+                <div class="tt-fn fe">authorizeGuard: CanActivateFn</div>
+                <ul class="tt-steps">
+                  <li>Returns Observable&lt;boolean | UrlTree&gt; — async guard</li>
+                  <li>toObservable(authService.isInitialized).pipe(filter(v =&gt; v), take(1))</li>
+                  <li class="c-ok">Waits until isInitialized emits true (init done)</li>
+                  <li>map(() =&gt; authService.isLoggedIn() ? true : router.createUrlTree(['/login']))</li>
+                  <li class="c-ok">Session restored → isLoggedIn() = true → dashboard loads</li>
+                  <li class="c-err">No valid cookie → isLoggedIn() = false → redirected to /login</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ DASHBOARD ════ -->
+    <div class="screen-wrap">
+      <div class="screen-topbar">
+        <div class="screen-dots"><div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div></div>
+        <div class="screen-url">/dashboard</div>
+        <span class="badge-protected">🔒 AuthorizeGuard</span>
+      </div>
+      <div class="screen-body">
+        <div class="mock-card">
+
+          <div class="iel">
+            <div class="guard-indicator">🛡 AuthorizeGuard — waits for init, then checks token</div>
+            <div class="tt tt-r">
+              <div class="tt-section tt-section-fe">
+                <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend — authorize.guard.ts</div>
+                <div class="tt-trigger">⚙ canActivate() — Route Guard</div>
+                <div class="tt-fn fe">authorizeGuard: CanActivateFn</div>
+                <ul class="tt-steps">
+                  <li>Returns Observable&lt;boolean | UrlTree&gt; — async, does NOT block synchronously</li>
+                  <li>toObservable(authService.isInitialized).pipe(filter(v =&gt; v), take(1))</li>
+                  <li class="c-ok">Suspends until APP_INITIALIZER completes (session restored or absent)</li>
+                  <li>map(() =&gt; authService.isLoggedIn()) → this.token !== null</li>
+                  <li class="c-ok">true → return true → /dashboard loads normally</li>
+                  <li class="c-err">false → return router.createUrlTree(['/login'])</li>
+                  <li class="c-ok">✓ Page refresh: initializeAuth() restores JWT before guard runs → no false redirect</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="mock-user-row">
+            <div class="mock-avatar">J</div>
+            <div>
+              <div style="font-weight:800;font-size:0.9rem;">John Doe</div>
+              <div style="font-size:0.72rem;color:var(--muted2);">john@example.com</div>
+              <div style="margin-top:5px;display:flex;gap:6px;align-items:center;">
+                <span class="role-pill">User</span>
+                <span style="font-size:0.62rem;color:var(--green);">✓ Verified</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mock-stat-row">
+            <div class="mock-stat"><div class="mock-stat-v">✓</div><div class="mock-stat-l">Email Verified</div></div>
+            <div class="mock-stat"><div class="mock-stat-v" style="font-size:0.75rem;">JWT</div><div class="mock-stat-l">Active</div></div>
+            <div class="mock-stat"><div class="mock-stat-v">6h</div><div class="mock-stat-l">Token Life</div></div>
+          </div>
+
+          <div class="mock-alert alert-success">✓ Authenticated — JWT sent via Authorization header on every request</div>
+
+          <div class="iel">
+            <div class="init-indicator">⚙ Loading user info from signal…</div>
+            <div class="tt tt-r">
+              <div class="tt-section tt-section-fe">
+                <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend — DashboardComponent</div>
+                <div class="tt-trigger">⚙ ngOnInit</div>
+                <div class="tt-fn fe">ngOnInit()</div>
+                <ul class="tt-steps">
+                  <li>Read authService.currentUser() (Angular signal, reactive)</li>
+                  <li>this.email = user.email; this.roles = user.roles</li>
+                  <li>this.initial = email[0].toUpperCase() for avatar</li>
+                  <li>Decode JWT to show expiry countdown</li>
+                  <li class="c-err">If currentUser() is null → safety check: navigate to /login</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="iel">
+            <button class="mock-btn btn-danger" style="border:1.5px solid var(--red);">Sign Out</button>
+            <div class="tt">
+              <div class="tt-section tt-section-fe">
+                <div class="tt-section-head fe"><span class="tt-section-badge fe">ANGULAR</span> Frontend — AuthService</div>
+                <div class="tt-trigger">🖱 onClick</div>
+                <div class="tt-fn fe">onLogout() → authService.logout()</div>
+                <ul class="tt-steps">
+                  <li>email = currentUser()?.email</li>
+                  <li class="c-api">POST /api/auth/logout → { email } (fire-and-forget)</li>
+                  <li>this.token = null (clear from memory)</li>
+                  <li>currentUserSignal.set(null)</li>
+                  <li class="c-nav">→ router.navigate(['/login'])</li>
+                </ul>
+              </div>
+              <div class="tt-section tt-section-be">
+                <div class="tt-section-head be"><span class="tt-section-badge be">.NET</span> Backend — AuthEndpoints.cs</div>
+                <div class="tt-fn be">MapPost("/logout") → inline handler</div>
+                <ul class="tt-steps">
+                  <li class="c-be">userRepo.FindByEmailAsync(email)</li>
+                  <li>user.RefreshToken = null; user.RefreshTokenExpiresAt = null</li>
+                  <li class="c-be">userRepo.UpdateAsync(user) — nulls refresh token</li>
+                  <li class="c-ok">CookieHelper.ClearRefreshTokenCookie() → Max-Age=0 (deletes cookie)</li>
+                </ul>
+              </div>
+              <div class="tt-section tt-section-db">
+                <div class="tt-section-head db"><span class="tt-section-badge db">SQL</span> Database — AspNetUsers</div>
+                <div class="tt-fn db">UserRepository.UpdateAsync() via UserManager.UpdateAsync()</div>
+                <ul class="tt-steps">
+                  <li class="c-db">UPDATE AspNetUsers SET RefreshToken=NULL, RefreshTokenExpiresAt=NULL WHERE Email=email</li>
+                  <li>Stolen refresh cookie can no longer be used — invalidated server-side</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /screens-grid -->
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 2 — DATABASE SCHEMA
+══════════════════════════════════════════ -->
+<div style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+<div class="section" id="database">
+  <div class="section-label">Section 02</div>
+  <div class="section-title">SQL Database Schema</div>
+  <div class="section-sub">SQL Server LocalDB · Entity Framework Core · What is stored, why, and how it's secured</div>
+
+  <div class="db-grid">
+
+    <!-- AspNetUsers -->
+    <div class="db-card">
+      <div class="db-head">
+        <div class="db-icon" style="background:#1e3a5f;">👤</div>
+        <div>
+          <div class="db-name">AspNetUsers</div>
+          <div class="db-note">ApplicationUser extends IdentityUser — all registered users</div>
+        </div>
+      </div>
+      <table class="db-table">
+        <thead><tr><th>Column</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><span class="c-col">Id</span><span class="c-pk">PK</span></td><td><span class="c-type">nvarchar(450)</span></td><td class="c-desc">GUID string — IdentityUser primary key</td></tr>
+          <tr><td><span class="c-col">Email</span></td><td><span class="c-type">nvarchar(256)</span></td><td class="c-desc">Unique. Used for login + OTP delivery via Gmail</td></tr>
+          <tr><td><span class="c-col">NormalizedEmail</span></td><td><span class="c-type">nvarchar(256)</span></td><td class="c-desc">UPPERCASE version — used by Identity for fast lookups</td></tr>
+          <tr><td><span class="c-col">PasswordHash</span></td><td><span class="c-type">nvarchar(max)</span></td><td><span class="c-hash">HASHED</span> <span class="c-desc">— ASP.NET Identity PBKDF2. Never plaintext.</span></td></tr>
+          <tr><td><span class="c-col">FirstName</span></td><td><span class="c-type">nvarchar(max)</span></td><td class="c-desc">Custom field — user's first name (from registration)</td></tr>
+          <tr><td><span class="c-col">LastName</span></td><td><span class="c-type">nvarchar(max)</span></td><td class="c-desc">Custom field — user's last name (from registration)</td></tr>
+          <tr><td><span class="c-col">IsVerified</span></td><td><span class="c-type">bit</span></td><td class="c-desc"><strong>false</strong> on register → <strong>true</strong> after OTP verification</td></tr>
+          <tr><td><span class="c-col">CreatedAt</span></td><td><span class="c-type">datetime2</span></td><td class="c-desc">UTC — when user first registered</td></tr>
+          <tr><td><span class="c-col">VerifiedAt</span></td><td><span class="c-type">datetime2?</span></td><td class="c-desc">UTC — set when OTP verified. NULL until then.</td></tr>
+          <tr><td><span class="c-col">RefreshToken</span></td><td><span class="c-type">nvarchar(max)?</span></td><td><span class="c-hash">SHA-256 HASH</span> <span class="c-desc">— plain Guid hashed before storage. NULL after logout.</span></td></tr>
+          <tr><td><span class="c-col">RefreshTokenExpiresAt</span></td><td><span class="c-type">datetime2?</span></td><td class="c-desc">UTC — now + 60 days. NULL after logout.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- EmailVerifications -->
+    <div class="db-card">
+      <div class="db-head">
+        <div class="db-icon" style="background:#14352a;">📧</div>
+        <div>
+          <div class="db-name">EmailVerifications</div>
+          <div class="db-note">OTP records for Registration &amp; Password Reset flows</div>
+        </div>
+      </div>
+      <table class="db-table">
+        <thead><tr><th>Column</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><span class="c-col">Id</span><span class="c-pk">PK</span></td><td><span class="c-type">uniqueidentifier</span></td><td class="c-desc">Guid.NewGuid() primary key</td></tr>
+          <tr><td><span class="c-col">Email</span></td><td><span class="c-type">nvarchar(256)</span></td><td class="c-desc">Required. The user's email address for this OTP</td></tr>
+          <tr><td><span class="c-col">OTPHash</span></td><td><span class="c-type">nvarchar(64)</span></td><td><span class="c-hash">SHA-256 HASH</span> <span class="c-desc">— plaintext OTP NEVER stored. Only hash. Max 64 chars.</span></td></tr>
+          <tr><td><span class="c-col">ExpiresAt</span></td><td><span class="c-type">datetime2</span></td><td class="c-desc">UTC now + 10 minutes. OTP invalid after this time.</td></tr>
+          <tr><td><span class="c-col">IsVerified</span></td><td><span class="c-type">bit</span></td><td class="c-desc">Set to true after successful OTP match</td></tr>
+          <tr><td><span class="c-col">Purpose</span></td><td><span class="c-type">nvarchar(max)</span></td><td class="c-desc"><strong>"Registration"</strong> or <strong>"PasswordReset"</strong> — keeps flows separate</td></tr>
+          <tr><td><span class="c-col">RequestCount</span></td><td><span class="c-type">int</span></td><td class="c-desc">Increments on every resend. Rate limit: max 3 per email per hour</td></tr>
+          <tr><td><span class="c-col">LastRequestAt</span></td><td><span class="c-type">datetime2</span></td><td class="c-desc">UTC — timestamp of last OTP request. Used for 1-hour window check</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- AspNetRoles -->
+    <div class="db-card">
+      <div class="db-head">
+        <div class="db-icon" style="background:#2d1b4e;">🎭</div>
+        <div>
+          <div class="db-name">AspNetRoles</div>
+          <div class="db-note">IdentityRole — 2 roles seeded at startup by Program.cs</div>
+        </div>
+      </div>
+      <table class="db-table">
+        <thead><tr><th>Column</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><span class="c-col">Id</span><span class="c-pk">PK</span></td><td><span class="c-type">nvarchar(450)</span></td><td class="c-desc">GUID string</td></tr>
+          <tr><td><span class="c-col">Name</span></td><td><span class="c-type">nvarchar(256)</span></td><td class="c-desc"><strong>"Admin"</strong> or <strong>"User"</strong> — seeded in Program.cs on first startup</td></tr>
+          <tr><td><span class="c-col">NormalizedName</span></td><td><span class="c-type">nvarchar(256)</span></td><td class="c-desc">"ADMIN" or "USER" — used by [Authorize(Roles="Admin")] check</td></tr>
+          <tr><td><span class="c-col">ConcurrencyStamp</span></td><td><span class="c-type">nvarchar(max)</span></td><td class="c-desc">Managed by Identity for optimistic concurrency</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- AspNetUserRoles -->
+    <div class="db-card">
+      <div class="db-head">
+        <div class="db-icon" style="background:#3d1c00;">🔗</div>
+        <div>
+          <div class="db-name">AspNetUserRoles</div>
+          <div class="db-note">Many-to-many join table — assigns roles to users</div>
+        </div>
+      </div>
+      <table class="db-table">
+        <thead><tr><th>Column</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><span class="c-col">UserId</span><span class="c-pk">PK</span><span class="c-fk">FK</span></td><td><span class="c-type">nvarchar(450)</span></td><td class="c-desc">FK → AspNetUsers.Id</td></tr>
+          <tr><td><span class="c-col">RoleId</span><span class="c-pk">PK</span><span class="c-fk">FK</span></td><td><span class="c-type">nvarchar(450)</span></td><td class="c-desc">FK → AspNetRoles.Id</td></tr>
+        </tbody>
+      </table>
+      <div style="padding:12px 14px;background:var(--surface2);font-size:0.68rem;color:var(--muted2);line-height:1.6;border-top:1px solid var(--border);">
+        <strong style="color:var(--text);">How roles reach Angular:</strong><br/>
+        UserManager.GetRolesAsync(user) → joins this table → returns <code style="color:var(--accent);">["User"]</code> or <code style="color:var(--accent);">["Admin"]</code> → included in JWT claims → returned in <code style="color:var(--accent);">AuthResult.roles</code> → stored in <code style="color:var(--accent);">currentUserSignal</code>
+      </div>
+    </div>
+
+    <!-- Security Box -->
+    <div class="db-card span2">
+      <div class="db-head">
+        <div class="db-icon" style="background:#14352a;">🔐</div>
+        <div>
+          <div class="db-name">What is NEVER stored as plaintext</div>
+          <div class="db-note">All sensitive values are hashed or derived before DB insertion</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1px;background:var(--border);">
+        <div style="background:var(--surface2);padding:14px;">
+          <div style="font-size:0.72rem;font-weight:700;color:var(--red);margin-bottom:4px;">❌ Never: User Password</div>
+          <div style="font-size:0.67rem;color:var(--muted2);">Identity hashes with PBKDF2 automatically. Column <code style="color:var(--pink);">PasswordHash</code> stores only the derived hash.</div>
+        </div>
+        <div style="background:var(--surface2);padding:14px;">
+          <div style="font-size:0.72rem;font-weight:700;color:var(--red);margin-bottom:4px;">❌ Never: OTP Code</div>
+          <div style="font-size:0.67rem;color:var(--muted2);">OTP is sent in Gmail only. Column <code style="color:var(--pink);">OTPHash</code> = SHA-256(otp). DB breach can't replay OTPs.</div>
+        </div>
+        <div style="background:var(--surface2);padding:14px;">
+          <div style="font-size:0.72rem;font-weight:700;color:var(--red);margin-bottom:4px;">❌ Never: Refresh Token (plain in DB)</div>
+          <div style="font-size:0.67rem;color:var(--muted2);">Plain Guid generated → sent to client via <strong style="color:var(--accent)">HttpOnly Secure Cookie</strong>. SHA-256(guid) hash stored in DB. On validate: server hashes incoming plain token → compares with stored hash.</div>
+        </div>
+        <div style="background:var(--surface2);padding:14px;">
+          <div style="font-size:0.72rem;font-weight:700;color:var(--red);margin-bottom:4px;">❌ Never: JWT Secret Key</div>
+          <div style="font-size:0.67rem;color:var(--muted2);">Not in DB. Read at runtime from <code style="color:var(--accent);">JWT_SECRET_KEY</code> env var. Dev fallback: appsettings only with ⚠ warning.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 3 — APP FLOW
+══════════════════════════════════════════ -->
+<div class="section" id="flow">
+  <div class="section-label">Section 03</div>
+  <div class="section-title">Application Navigation Flow</div>
+  <div class="section-sub">Complete user journeys — Screen → API → DB → Memory → Next Screen</div>
+
+  <div class="flow-block">
+    <div class="flow-label">Registration + OTP Verification</div>
+    <div class="flow-scroll"><div class="flow-row">
+      <div class="fstep"><span class="ftag ft-route">/register</span><div class="fn fn-screen">Register Screen</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-api">POST /register</span><div class="fn fn-api">Validate + create user</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-db">DB INSERT</span><div class="fn fn-backend">AspNetUsers (IsVerified=false)</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-db">DB INSERT</span><div class="fn fn-backend">EmailVerifications (OTPHash)</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-logic">Gmail</span><div class="fn fn-backend">Plaintext OTP in email</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-route">/verify-otp</span><div class="fn fn-screen">Verify OTP Screen</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-api">POST /verify-otp</span><div class="fn fn-api">SHA-256(otp)==OTPHash?</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-db">DB UPDATE</span><div class="fn fn-backend">IsVerified=true, JWT issued</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-logic">Memory + Cookie</span><div class="fn fn-backend">JWT in memory + refresh cookie set</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-route">/dashboard</span><div class="fn fn-success">Dashboard ✓</div></div>
+    </div></div>
+  </div>
+
+  <div class="flow-block">
+    <div class="flow-label">Login</div>
+    <div class="flow-scroll"><div class="flow-row">
+      <div class="fstep"><span class="ftag ft-route">/login</span><div class="fn fn-screen">Login Screen</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-api">POST /login</span><div class="fn fn-api">Check creds + IsVerified</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-db">DB UPDATE</span><div class="fn fn-backend">RefreshToken hash stored (60d)</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-logic">Memory + Cookie</span><div class="fn fn-backend">JWT in memory + refresh cookie set</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-route">/dashboard</span><div class="fn fn-success">Dashboard ✓</div></div>
+    </div></div>
+  </div>
+
+  <div class="flow-block">
+    <div class="flow-label">Page Refresh — Session Restoration via APP_INITIALIZER</div>
+    <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:0.7rem;color:var(--muted2);">
+      Without this flow: guard fires before JWT is restored → user incorrectly redirected to /login despite having a valid refresh token cookie.
+    </div>
+    <div class="flow-scroll"><div class="flow-row">
+      <div class="fstep"><span class="ftag ft-logic">Browser Refresh</span><div class="fn fn-screen">JWT lost from memory</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-logic">APP_INITIALIZER</span><div class="fn fn-backend">initializeAuth() — before any guard</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-api">POST /api/auth/refresh</span><div class="fn fn-api">Browser auto-sends HttpOnly cookie</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-db">DB UPDATE</span><div class="fn fn-backend">Rotate: old hash invalidated, new hash stored</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-logic">Memory + Cookie</span><div class="fn fn-success">New JWT in memory + new refresh cookie set</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-logic">Signal</span><div class="fn fn-success">isInitialized = true</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-logic">Guard unblocks</span><div class="fn fn-success">isLoggedIn() = true</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-route">/dashboard</span><div class="fn fn-success">Session restored ✓</div></div>
+    </div></div>
+    <div style="font-size:0.72rem;color:var(--green);margin-top:10px;">✓ Guard suspends via Observable until isInitialized fires true. Zero premature redirects to /login.</div>
+    <div style="font-size:0.72rem;color:var(--red);margin-top:6px;">⚠ If /refresh fails (cookie absent or expired) → isInitialized = true, isLoggedIn() = false → guard redirects to /login as expected.</div>
+  </div>
+
+  <div class="flow-block">
+    <div class="flow-label">Password Reset — 3 Steps (Email → OTP Verify → New Password)</div>
+    <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:0.7rem;color:var(--muted2);"
+    >Step ① /forgot-password → Step ② /reset-password (OTP only) → Step ③ /new-password (new password only)</div>
+    <div class="flow-scroll"><div class="flow-row">
+      <div class="fstep"><span class="ftag ft-route">/forgot-password</span><div class="fn fn-screen">① Enter Email</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-api">POST /request-reset</span><div class="fn fn-api">User exists? Rate limit?</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-db">DB INSERT</span><div class="fn fn-backend">EmailVerifications (OTPHash)</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-logic">Gmail</span><div class="fn fn-backend">Plaintext OTP emailed</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-route">/reset-password</span><div class="fn fn-screen">② Enter OTP only</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-api">POST /verify-reset-otp</span><div class="fn fn-api">SHA-256(otp)==OTPHash?</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-db">DB READ</span><div class="fn fn-backend">OTP valid + not expired → return resetToken</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-route">/new-password</span><div class="fn fn-screen">③ New Password only</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-api">POST /reset-password</span><div class="fn fn-api">Validate resetToken</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-db">DB UPDATE</span><div class="fn fn-backend">PasswordHash updated, OTP deleted</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-route">/login</span><div class="fn fn-success">Login ✓</div></div>
+    </div></div>
+  </div>
+
+  <div class="flow-block">
+    <div class="flow-label">Auto Token Refresh + Rotation (401 Error Interceptor)</div>
+    <div class="flow-scroll"><div class="flow-row">
+      <div class="fstep"><span class="ftag ft-logic">Any API Call</span><div class="fn fn-screen">JWT expired (after 6h)</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><div class="fn fn-error">401 Unauthorized</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-logic">ErrorInterceptor</span><div class="fn fn-backend">Has refreshToken cookie?</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-api">POST /api/auth/refresh</span><div class="fn fn-api">SHA-256(rt)==DB hash?</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-db">DB UPDATE</span><div class="fn fn-backend">Invalidate old token hash</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-db">DB INSERT</span><div class="fn fn-backend">Store NEW refresh hash</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-logic">Cookie</span><div class="fn fn-success">NEW refresh cookie set</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><span class="ftag ft-logic">Memory</span><div class="fn fn-success">NEW JWT in memory</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><div class="fn fn-success">Original request retried ✓</div></div>
+    </div></div>
+    <div style="font-size:0.72rem;color:var(--orange);margin-top:10px;">🔄 Token Rotation: each /refresh issues NEW access token + NEW refresh token. Old refresh token immediately invalidated.</div>
+    <div style="font-size:0.72rem;color:var(--red);margin-top:6px;">⚠ If /refresh also fails (expired/invalid) → authService.logout() → router.navigate(['/login'])</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 4 — SECURITY
+══════════════════════════════════════════ -->
+<div style="background:var(--surface);border-top:1px solid var(--border);">
+<div class="section" id="security">
+  <div class="section-label">Section 04</div>
+  <div class="section-title">Security Checklist</div>
+  <div class="section-sub">All 11 requirements implemented — backend + frontend</div>
+  <div class="sec-grid">
+    <div class="sec-item"><div class="sec-icon">✓</div><div><div class="sec-lbl">Crypto-secure OTP</div><div class="sec-desc">OS-level CSPRNG — not predictable Random.Next()</div><div class="sec-code">RandomNumberGenerator.GetInt32(100000, 999999)</div></div></div>
+    <div class="sec-item"><div class="sec-icon">✓</div><div><div class="sec-lbl">OTP Hashed in DB</div><div class="sec-desc">DB breach can't expose valid OTPs. Only SHA-256 stored.</div><div class="sec-code">OTPHash = Convert.ToBase64String(SHA256(otp))</div></div></div>
+    <div class="sec-item"><div class="sec-icon">✓</div><div><div class="sec-lbl">Refresh Token Hashed</div><div class="sec-desc">Guid hashed before DB insert. Client stores the hash.</div><div class="sec-code">RefreshToken = SHA256(Guid.NewGuid().ToString())</div></div></div>
+    <div class="sec-item"><div class="sec-icon">✓</div><div><div class="sec-lbl">JWT Secret from Env Var</div><div class="sec-desc">Not in appsettings. Production throws if env var missing.</div><div class="sec-code">Environment.GetEnvironmentVariable("JWT_SECRET_KEY")</div></div></div>
+    <div class="sec-item"><div class="sec-icon">✓</div><div><div class="sec-lbl">HTTPS in Production</div><div class="sec-desc">Skipped in Development (dev cert). Enforced in Production.</div><div class="sec-code">if (!IsDevelopment()) app.UseHttpsRedirection()</div></div></div>
+    <div class="sec-item"><div class="sec-icon">✓</div><div><div class="sec-lbl">OTP Rate Limiting</div><div class="sec-desc">Max 3 OTP requests per email per hour. Returns HTTP 429.</div><div class="sec-code">recentRequests >= 3 within last AddHours(-1)</div></div></div>
+    <div class="sec-item"><div class="sec-icon">✓</div><div><div class="sec-lbl">Secure Token Storage</div><div class="sec-desc">Access token: Angular memory only. Refresh token: HttpOnly Secure Cookie (browser-managed). No localStorage. XSS safe.</div><div class="sec-code">Set-Cookie: refreshToken=…; HttpOnly; Secure; SameSite=Strict</div></div></div>
+    <div class="sec-item"><div class="sec-icon">✓</div><div><div class="sec-lbl">Token Revocation on Logout</div><div class="sec-desc">RefreshToken nulled in DB + HttpOnly cookie cleared by backend. Stolen token can't be reused.</div><div class="sec-code">user.RefreshToken = null; Response.Cookies.Delete("refreshToken")</div></div></div>
+    <div class="sec-item"><div class="sec-icon">✓</div><div><div class="sec-lbl">Refresh Token Rotation</div><div class="sec-desc">Every /refresh call issues NEW access token + NEW refresh token. Old token immediately invalidated. Prevents token replay attacks.</div><div class="sec-code">POST /api/auth/refresh → new JWT + new refreshToken cookie</div></div></div>
+    <div class="sec-item"><div class="sec-icon">✓</div><div><div class="sec-lbl">No Sensitive Data in URLs</div><div class="sec-desc">resetToken never passed as query param — stored in service state. Prevents leakage via browser history, server logs, or referrer headers.</div><div class="sec-code">navigate(['/new-password'], { queryParams: { email } })</div></div></div>
+    <div class="sec-item"><div class="sec-icon">✓</div><div><div class="sec-lbl">Auth Init Guard (No Race Condition)</div><div class="sec-desc">APP_INITIALIZER restores session from refresh cookie before any route guard runs. Guards return Observable and suspend via <code style="color:var(--accent)">isInitialized</code> signal until init completes. Eliminates false redirects to /login on page refresh.</div><div class="sec-code">toObservable(isInitialized).pipe(filter(v =&gt; v), take(1))</div></div></div>
+  </div>
+</div>
+</div>
+
+<div class="footer">
+  TodoAuth Interactive UI Blueprint &nbsp;·&nbsp; .NET 10 + Angular 21 &nbsp;·&nbsp; Hover any element to see its function &nbsp;·&nbsp; JWT + OTP + SHA-256 + Clean Architecture
+</div>
+
+</body>
+</html>

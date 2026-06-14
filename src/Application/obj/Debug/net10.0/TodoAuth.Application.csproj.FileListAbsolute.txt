@@ -1,0 +1,15 @@
+C:\Users\91748\Downloads\Todo_student\src\Application\bin\Debug\net10.0\TodoAuth.Application.deps.json
+C:\Users\91748\Downloads\Todo_student\src\Application\bin\Debug\net10.0\TodoAuth.Application.dll
+C:\Users\91748\Downloads\Todo_student\src\Application\bin\Debug\net10.0\TodoAuth.Application.pdb
+C:\Users\91748\Downloads\Todo_student\src\Application\bin\Debug\net10.0\TodoAuth.Domain.dll
+C:\Users\91748\Downloads\Todo_student\src\Application\bin\Debug\net10.0\TodoAuth.Domain.pdb
+C:\Users\91748\Downloads\Todo_student\src\Application\obj\Debug\net10.0\TodoAuth.Application.csproj.AssemblyReference.cache
+C:\Users\91748\Downloads\Todo_student\src\Application\obj\Debug\net10.0\TodoAuth.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\91748\Downloads\Todo_student\src\Application\obj\Debug\net10.0\TodoAuth.Application.AssemblyInfoInputs.cache
+C:\Users\91748\Downloads\Todo_student\src\Application\obj\Debug\net10.0\TodoAuth.Application.AssemblyInfo.cs
+C:\Users\91748\Downloads\Todo_student\src\Application\obj\Debug\net10.0\TodoAuth.Application.csproj.CoreCompileInputs.cache
+C:\Users\91748\Downloads\Todo_student\src\Application\obj\Debug\net10.0\TodoAuth.63809E71.Up2Date
+C:\Users\91748\Downloads\Todo_student\src\Application\obj\Debug\net10.0\TodoAuth.Application.dll
+C:\Users\91748\Downloads\Todo_student\src\Application\obj\Debug\net10.0\refint\TodoAuth.Application.dll
+C:\Users\91748\Downloads\Todo_student\src\Application\obj\Debug\net10.0\TodoAuth.Application.pdb
+C:\Users\91748\Downloads\Todo_student\src\Application\obj\Debug\net10.0\ref\TodoAuth.Application.dll
